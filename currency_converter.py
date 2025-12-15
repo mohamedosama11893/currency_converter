@@ -22,6 +22,62 @@ import requests
 API_KEY = "Put_Your_Api_Key_Here"
 BASE_URL = "https://api.apilayer.com/fixer"
 
+#======================================================================================================#
+#===================================== Helper Functions =================================================#
+#======================================================================================================#
+def handle_error(response):
+    """
+    Handle API error responses with detailed messages.
+
+    Args:
+        response (requests.Response): The HTTP response object from the API.
+    """
+    code = response.status_code
+    if code == 401:
+        print("❌ Unauthorized: Check your API key.")
+    elif code == 403:
+        print("❌ Forbidden: You don't have access to this service.")
+    elif code == 404:
+        print("❌ Not Found: The requested resource does not exist.")
+    elif code == 429:
+        print("❌ Too Many Requests: You exceeded the API request limit.")
+    elif code >= 500:
+        print("❌ Server Error: Try again later.")
+    else:
+        print("❌ Unexpected Error:", code)
+        print("Response:", response.text)
+
+#======================================================================================================#
+def get_symbols():
+    """
+    Fetch available currency symbols from the API.
+
+    Returns:
+        dict: A dictionary where keys are currency codes (e.g., "USD")
+              and values are currency names (e.g., "United States Dollar").
+              Returns {} if request fails.
+    """
+    url = f"{BASE_URL}/symbols"
+    headers = {"apikey": API_KEY}
+    try:
+        response = requests.get(url, headers=headers)
+    except requests.exceptions.RequestException as e:
+        print("❌ Network error while fetching symbols:", e)
+        return {}
+
+    if response.status_code != 200:
+        handle_error(response)
+        return {}
+
+    data = response.json()
+    # Some APIs might omit the "success" field, so we check safely
+    if not data.get("success", True):
+        print("❌ API Error:", data.get("error", data))
+        return {}
+
+    return data.get("symbols", {})
+
+#======================================================================================================#
 
 
 #======================================================================================================#
