@@ -139,6 +139,55 @@ def choose_currency_from(displayed_dict, prompt):
         print("❌ Invalid currency code. Please choose from the list shown.")
 
 #======================================================================================================#
+def get_amount():
+    """
+    Prompt the user for a valid positive numeric amount.
+
+    Returns:
+        float: The entered amount.
+    """
+    while True:
+        try:
+            amount = float(input("Enter the amount: "))
+        except ValueError:
+            print("❌ The amount must be a numeric value!")
+            continue
+        if amount <= 0:
+            print("❌ The amount must be greater than 0")
+            continue
+        return amount
+
+#======================================================================================================#
+def convert_currency(from_currency, to_currency, amount):
+    """
+    Perform currency conversion using the API.
+
+    Args:
+        from_currency (str): Source currency code (e.g., "USD").
+        to_currency (str): Target currency code (e.g., "EUR").
+        amount (float): Amount to convert.
+
+    Returns:
+        float | None: The converted amount, or None if failed.
+    """
+    url = f"{BASE_URL}/convert?to={to_currency}&from={from_currency}&amount={amount}"
+    headers = {"apikey": API_KEY}
+    try:
+        response = requests.get(url, headers=headers)
+    except requests.exceptions.RequestException as e:
+        print("❌ Network error while converting:", e)
+        return None
+
+    if response.status_code != 200:
+        handle_error(response)
+        return None
+
+    data = response.json()
+    if not data.get("success", True):
+        print("❌ API Error:", data.get("error", data))
+        return None
+
+    return data.get("result")
 
 #======================================================================================================#
 #==================================== Main program flow================================================#
