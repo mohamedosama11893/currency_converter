@@ -78,6 +78,48 @@ def get_symbols():
     return data.get("symbols", {})
 
 #======================================================================================================#
+def search_symbols(symbols):
+    """
+    Let the user search currencies or view all.
+
+    Args:
+        symbols (dict): Dictionary of all currency codes and names.
+
+    Returns:
+        dict: A filtered dictionary of matches or the full symbols dict.
+    """
+    while True:
+        choice = input("Do you want to search for a currency or view all? (search/all): ").strip().lower()
+        if choice in ("search", "all"):
+            break
+        print("❌ Invalid choice. Please type 'search' or 'all'.")
+
+    if choice == "search":
+        keyword = input("Enter part of currency name/code to search: ").strip().lower()
+        matches = {c: n for c, n in symbols.items() if keyword in c.lower() or keyword in n.lower()}
+        if matches:
+            print("\n🔎 Matching Currencies:\n" + "-" * 40)
+            for code, name in matches.items():
+                print(f"{code} : {name}")
+            return matches
+        else:
+            print("❌ No matches found.")
+            # Offer retry or full list
+            while True:
+                nxt = input("Type 'retry' to search again, or 'all' to view all currencies: ").strip().lower()
+                if nxt == "retry":
+                    return search_symbols(symbols)   # recursion: try again
+                if nxt == "all":
+                    break
+                print("❌ Invalid. Type 'retry' or 'all'.")
+
+    # If choice is "all" or user chose 'all' after no matches
+    print("\nAvailable Currencies:\n" + "-" * 40)
+    for code, name in symbols.items():
+        print(f"{code} : {name}")
+    return symbols
+
+#======================================================================================================#
 
 
 #======================================================================================================#
