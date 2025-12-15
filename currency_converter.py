@@ -120,7 +120,25 @@ def search_symbols(symbols):
     return symbols
 
 #======================================================================================================#
+def choose_currency_from(displayed_dict, prompt):
+    """
+    Ask user to choose a valid currency code from a given dictionary.
 
+    Args:
+        displayed_dict (dict): Dictionary of allowed currencies (shown to user).
+        prompt (str): Prompt message asking for input.
+
+    Returns:
+        str: The chosen valid currency code.
+    """
+    allowed = set(displayed_dict.keys())  # using set for faster lookup
+    while True:
+        cur = input(prompt).strip().upper()
+        if cur in allowed:
+            return cur
+        print("❌ Invalid currency code. Please choose from the list shown.")
+
+#======================================================================================================#
 
 #======================================================================================================#
 #==================================== Main program flow================================================#
